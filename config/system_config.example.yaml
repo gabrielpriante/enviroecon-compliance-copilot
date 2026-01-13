@@ -1,0 +1,188 @@
+# System Configuration Example
+# Copy this file to system_config.yaml and update with your settings
+# NEVER commit actual API keys or credentials
+
+system:
+  name: "EnviroEcon Compliance Copilot"
+  version: "0.1.0-dev"
+  environment: "development"  # development, testing, production
+
+# AI Model Configuration
+ai:
+  # Primary model for regulatory analysis
+  primary_model:
+    provider: "openai"  # or "anthropic", "local"
+    model: "gpt-4"
+    temperature: 0.1  # Low temperature for conservative, consistent outputs
+    max_tokens: 4000
+    
+  # Model for citation verification
+  verification_model:
+    provider: "openai"
+    model: "gpt-4"
+    temperature: 0.0  # Zero temperature for verification tasks
+    
+  # Prompting configuration
+  prompts:
+    conservative_mode: true
+    require_citations: true
+    flag_uncertainty: true
+    assumption_tracking: true
+
+# Guardrail Configuration
+guardrails:
+  citation_verification:
+    enabled: true
+    require_authoritative_source: true
+    max_citation_age_years: 5
+    verify_links: true
+    
+  hallucination_prevention:
+    enabled: true
+    cross_reference_check: true
+    source_verification_required: true
+    confidence_threshold: 0.85
+    
+  conservative_interpretation:
+    enabled: true
+    default_to_stricter: true
+    flag_ambiguity: true
+    require_professional_review_threshold: "medium"  # low, medium, high
+    
+  assumption_tracking:
+    enabled: true
+    require_explicit_documentation: true
+    categorize_assumptions: true
+    
+  non_legal_advice:
+    enabled: true
+    require_disclaimers: true
+    restrict_advice_language: true
+
+# Regulatory Data Sources
+data_sources:
+  federal:
+    ecfr:
+      enabled: true
+      base_url: "https://www.ecfr.gov/api/versioner/v1"
+      cache_duration_hours: 24
+      verify_ssl: true
+      
+    federal_register:
+      enabled: true
+      base_url: "https://www.federalregister.gov/api/v1"
+      cache_duration_hours: 24
+      
+    epa:
+      enabled: true
+      base_url: "https://www.epa.gov"
+      verify_ssl: true
+      
+  state:
+    # State-specific configuration
+    # Add state regulatory database endpoints as needed
+    enabled: false
+    sources: []
+
+# Output Configuration
+output:
+  formats:
+    - "markdown"
+    - "pdf"
+    - "docx"
+    
+  memorandum:
+    include_disclaimer: true
+    include_assumptions_section: true
+    include_limitations_section: true
+    include_citation_section: true
+    include_audit_trail: true
+    
+  citation_format:
+    style: "bluebook"  # or "alwd"
+    include_urls: true
+    verify_before_output: true
+    
+  disclaimers:
+    prominent_placement: true
+    custom_text: null  # null = use default, or provide custom disclaimer
+
+# Logging and Audit
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_to_file: true
+  log_directory: "logs/"
+  
+  audit_trail:
+    enabled: true
+    log_all_queries: true
+    log_all_sources: true
+    log_all_assumptions: true
+    log_verification_results: true
+    
+  sensitive_data:
+    anonymize_user_queries: true
+    redact_identifiable_info: true
+
+# Performance and Caching
+performance:
+  cache:
+    enabled: true
+    cache_directory: "cache/"
+    regulatory_text_cache_hours: 168  # 1 week
+    citation_verification_cache_hours: 24
+    verify_cache_freshness: true
+    
+  rate_limiting:
+    enabled: true
+    max_requests_per_minute: 10
+    max_concurrent_requests: 3
+
+# Testing Configuration
+testing:
+  test_mode: false
+  mock_external_apis: false
+  use_test_fixtures: false
+  
+  hallucination_tests:
+    enabled: true
+    test_database: "tests/fixtures/invalid_citations.yaml"
+    
+  guardrail_tests:
+    enabled: true
+    strict_mode: true
+
+# Security
+security:
+  api_keys:
+    # NEVER commit actual keys - use environment variables
+    openai_api_key_env: "OPENAI_API_KEY"
+    
+  input_validation:
+    max_query_length: 10000
+    sanitize_inputs: true
+    reject_malicious_patterns: true
+    
+  output_validation:
+    scan_for_pii: true
+    redact_sensitive_info: true
+
+# Feature Flags
+features:
+  multi_jurisdiction_analysis: false  # Planned feature
+  real_time_regulatory_monitoring: false  # Planned feature
+  automated_compliance_checklists: false  # Planned feature
+  comparative_jurisdiction_analysis: false  # Planned feature
+
+# Notification Settings
+notifications:
+  enabled: false
+  email:
+    enabled: false
+    smtp_server: null
+    from_address: null
+  
+  alerts:
+    verification_failures: true
+    guardrail_violations: true
+    system_errors: true
