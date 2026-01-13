@@ -1,0 +1,546 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gabrielpriante/enviroecon-compliance-copilot/schemas/user_input_schema.json",
+  "title": "User Input Wizard Schema",
+  "description": "JSON Schema for validating user inputs through the mandatory 5-step wizard defined in INPUT_CONTRACT.md",
+  "type": "object",
+  "required": [
+    "step_1_domain_jurisdiction",
+    "step_2_question",
+    "step_3_context",
+    "step_4_temporal_scope",
+    "step_5_preferences"
+  ],
+  "properties": {
+    "step_1_domain_jurisdiction": {
+      "type": "object",
+      "description": "Step 1: Regulatory Domain and Jurisdiction",
+      "required": [
+        "regulatory_domain",
+        "federal_jurisdiction",
+        "state_jurisdiction"
+      ],
+      "properties": {
+        "regulatory_domain": {
+          "type": "string",
+          "description": "Primary regulatory domain (REQUIRED)",
+          "enum": [
+            "rcra_hazardous_waste",
+            "clean_water_act",
+            "clean_air_act",
+            "cercla_superfund",
+            "tsca",
+            "epcra",
+            "safe_drinking_water",
+            "nepa",
+            "state_specific",
+            "other"
+          ]
+        },
+        "regulatory_domain_other": {
+          "type": "string",
+          "description": "Specification when regulatory_domain is 'other' or 'state_specific' (REQUIRED if other/state_specific)",
+          "minLength": 10,
+          "maxLength": 500
+        },
+        "federal_jurisdiction": {
+          "type": "string",
+          "description": "Whether federal regulations apply (REQUIRED, default: true)",
+          "enum": [
+            "true",
+            "false",
+            "unknown"
+          ],
+          "default": "true"
+        },
+        "state_jurisdiction": {
+          "type": "string",
+          "description": "State/territory jurisdiction (REQUIRED)",
+          "enum": [
+            "Alabama",
+            "Alaska",
+            "Arizona",
+            "Arkansas",
+            "California",
+            "Colorado",
+            "Connecticut",
+            "Delaware",
+            "Florida",
+            "Georgia",
+            "Hawaii",
+            "Idaho",
+            "Illinois",
+            "Indiana",
+            "Iowa",
+            "Kansas",
+            "Kentucky",
+            "Louisiana",
+            "Maine",
+            "Maryland",
+            "Massachusetts",
+            "Michigan",
+            "Minnesota",
+            "Mississippi",
+            "Missouri",
+            "Montana",
+            "Nebraska",
+            "Nevada",
+            "New Hampshire",
+            "New Jersey",
+            "New Mexico",
+            "New York",
+            "North Carolina",
+            "North Dakota",
+            "Ohio",
+            "Oklahoma",
+            "Oregon",
+            "Pennsylvania",
+            "Rhode Island",
+            "South Carolina",
+            "South Dakota",
+            "Tennessee",
+            "Texas",
+            "Utah",
+            "Vermont",
+            "Virginia",
+            "Washington",
+            "West Virginia",
+            "Wisconsin",
+            "Wyoming",
+            "District of Columbia",
+            "Puerto Rico",
+            "U.S. Virgin Islands",
+            "Guam",
+            "American Samoa",
+            "Northern Mariana Islands",
+            "unknown",
+            "multiple"
+          ],
+          "default": "unknown"
+        },
+        "local_jurisdiction_flag": {
+          "type": "string",
+          "description": "Whether local regulations may apply (OPTIONAL)",
+          "enum": [
+            "true",
+            "false",
+            "unknown"
+          ],
+          "default": "unknown"
+        }
+      },
+      "if": {
+        "properties": {
+          "regulatory_domain": {
+            "enum": [
+              "other",
+              "state_specific"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "regulatory_domain_other"
+        ]
+      }
+    },
+    "step_2_question": {
+      "type": "object",
+      "description": "Step 2: Specific Regulatory Question",
+      "required": [
+        "compliance_question",
+        "question_category"
+      ],
+      "properties": {
+        "compliance_question": {
+          "type": "string",
+          "description": "Specific compliance question (REQUIRED, 20-2000 characters)",
+          "minLength": 20,
+          "maxLength": 2000
+        },
+        "question_category": {
+          "type": "string",
+          "description": "Question category (REQUIRED)",
+          "enum": [
+            "regulatory_interpretation",
+            "applicability_determination",
+            "compliance_obligation",
+            "timeline_deadline",
+            "exemption_qualification",
+            "permit_requirement",
+            "reporting_requirement",
+            "other"
+          ]
+        },
+        "known_citations": {
+          "type": "string",
+          "description": "Known regulatory citations, one per line (OPTIONAL)",
+          "maxLength": 2000
+        }
+      }
+    },
+    "step_3_context": {
+      "type": "object",
+      "description": "Step 3: Factual Context and Assumptions",
+      "required": [
+        "activity_description"
+      ],
+      "properties": {
+        "facility_type": {
+          "type": "string",
+          "description": "Facility type (REQUIRED if facility-specific question)",
+          "enum": [
+            "industrial_manufacturing",
+            "commercial",
+            "construction_site",
+            "waste_management",
+            "wastewater_treatment",
+            "landfill",
+            "laboratory",
+            "healthcare",
+            "educational",
+            "government",
+            "agricultural",
+            "mining",
+            "not_applicable",
+            "other"
+          ],
+          "default": "not_applicable"
+        },
+        "facility_size": {
+          "type": "object",
+          "description": "Facility size/classification (context-sensitive based on regulatory domain)",
+          "properties": {
+            "rcra_classification": {
+              "type": "string",
+              "description": "RCRA generator classification (if domain is rcra_hazardous_waste)",
+              "enum": [
+                "large_quantity_generator",
+                "small_quantity_generator",
+                "very_small_quantity_generator",
+                "unknown"
+              ]
+            },
+            "cwa_classification": {
+              "type": "string",
+              "description": "Clean Water Act classification (if domain is clean_water_act)",
+              "enum": [
+                "major_discharger",
+                "minor_discharger",
+                "small_ms4",
+                "construction_over_1_acre",
+                "construction_under_1_acre",
+                "unknown"
+              ]
+            },
+            "caa_classification": {
+              "type": "string",
+              "description": "Clean Air Act classification (if domain is clean_air_act)",
+              "enum": [
+                "major_source",
+                "area_source",
+                "synthetic_minor",
+                "unknown"
+              ]
+            },
+            "generic_classification": {
+              "type": "string",
+              "description": "Generic size/classification description (for other domains)",
+              "maxLength": 500
+            }
+          }
+        },
+        "substances_materials": {
+          "type": "string",
+          "description": "Relevant substances/materials, one per line (REQUIRED if substance-specific question)",
+          "maxLength": 2000
+        },
+        "activity_description": {
+          "type": "string",
+          "description": "Activity description (REQUIRED, 50-2000 characters)",
+          "minLength": 50,
+          "maxLength": 2000
+        },
+        "additional_facts": {
+          "type": "string",
+          "description": "Additional relevant facts (OPTIONAL)",
+          "maxLength": 2000
+        }
+      }
+    },
+    "step_4_temporal_scope": {
+      "type": "object",
+      "description": "Step 4: Temporal Scope and Urgency",
+      "required": [
+        "regulatory_date_scope"
+      ],
+      "properties": {
+        "regulatory_date_scope": {
+          "type": "string",
+          "description": "Regulatory effective date scope (REQUIRED)",
+          "enum": [
+            "current_regulations",
+            "specific_date",
+            "historical_analysis",
+            "future_compliance"
+          ],
+          "default": "current_regulations"
+        },
+        "specific_date": {
+          "type": "string",
+          "description": "Specific date (REQUIRED if regulatory_date_scope is specific_date or historical_analysis)",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "future_compliance_date": {
+          "type": "string",
+          "description": "Future compliance date (REQUIRED if regulatory_date_scope is future_compliance)",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "deadline_urgency": {
+          "type": "string",
+          "description": "Time-sensitive action or deadline (OPTIONAL)",
+          "enum": [
+            "immediate_action_needed",
+            "upcoming_deadline",
+            "routine_planning",
+            "unknown",
+            "not_applicable"
+          ],
+          "default": "routine_planning"
+        },
+        "specific_deadline_date": {
+          "type": "string",
+          "description": "Specific deadline date (REQUIRED if deadline_urgency is immediate_action_needed or upcoming_deadline)",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "regulatory_date_scope": {
+                "enum": [
+                  "specific_date",
+                  "historical_analysis"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "specific_date"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "regulatory_date_scope": {
+                "const": "future_compliance"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "future_compliance_date"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "deadline_urgency": {
+                "enum": [
+                  "immediate_action_needed",
+                  "upcoming_deadline"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "specific_deadline_date"
+            ]
+          }
+        }
+      ]
+    },
+    "step_5_preferences": {
+      "type": "object",
+      "description": "Step 5: Analysis Preferences and Confirmation",
+      "required": [
+        "analysis_depth",
+        "conservative_interpretation",
+        "output_format",
+        "acknowledgment"
+      ],
+      "properties": {
+        "analysis_depth": {
+          "type": "string",
+          "description": "Desired analysis depth (REQUIRED)",
+          "enum": [
+            "comprehensive",
+            "focused",
+            "citation_summary"
+          ],
+          "default": "focused"
+        },
+        "include_state_research": {
+          "type": "boolean",
+          "description": "Include state regulatory research (REQUIRED if state specified in step 1)",
+          "default": true
+        },
+        "conservative_interpretation": {
+          "type": "string",
+          "description": "Conservative interpretation preference (REQUIRED)",
+          "enum": [
+            "strictly_conservative",
+            "balanced_conservative",
+            "analyze_alternatives"
+          ],
+          "default": "balanced_conservative"
+        },
+        "output_format": {
+          "type": "array",
+          "description": "Output format preference (REQUIRED, at least one)",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "markdown",
+              "pdf",
+              "docx",
+              "html"
+            ]
+          },
+          "default": [
+            "markdown"
+          ]
+        },
+        "acknowledgment": {
+          "type": "boolean",
+          "description": "Acknowledgment of limitations and disclaimers (REQUIRED, must be true)",
+          "const": true
+        },
+        "contact_email": {
+          "type": "string",
+          "description": "Contact email for follow-up questions (OPTIONAL)",
+          "format": "email",
+          "maxLength": 100
+        }
+      },
+      "if": {
+        "properties": {
+          "acknowledgment": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "not": {}
+      }
+    },
+    "validation_metadata": {
+      "type": "object",
+      "description": "Metadata about input validation (system-generated)",
+      "properties": {
+        "submission_timestamp": {
+          "type": "string",
+          "description": "When input was submitted",
+          "format": "date-time"
+        },
+        "validation_passed": {
+          "type": "boolean",
+          "description": "Whether all validation checks passed"
+        },
+        "clarification_requests": {
+          "type": "array",
+          "description": "Clarification requests issued during input collection",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "field": {
+                "type": "string"
+              },
+              "request": {
+                "type": "string"
+              },
+              "resolution": {
+                "type": "string",
+                "enum": [
+                  "information_provided",
+                  "limitation_noted",
+                  "assumption_documented"
+                ]
+              }
+            }
+          }
+        },
+        "assumptions_documented": {
+          "type": "array",
+          "description": "Assumptions documented based on user input",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "factual",
+                  "interpretive",
+                  "jurisdictional",
+                  "temporal"
+                ]
+              },
+              "assumption": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string",
+                "description": "Which field/input led to this assumption"
+              },
+              "impact": {
+                "type": "string",
+                "description": "Impact on analysis"
+              }
+            }
+          }
+        },
+        "warnings_issued": {
+          "type": "array",
+          "description": "Warnings issued during input validation",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "urgent_action_needed",
+                  "insufficient_information",
+                  "ambiguous_input",
+                  "outside_scope",
+                  "data_quality_issue"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "resolution": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
