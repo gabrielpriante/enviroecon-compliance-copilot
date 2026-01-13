@@ -1,0 +1,879 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gabrielpriante/enviroecon-compliance-copilot/schemas/memorandum_output_schema.json",
+  "title": "Regulatory / Environmental Compliance Response Memorandum Output Schema",
+  "description": "JSON Schema for validating compliance memorandum outputs against the mandatory 8-section structure defined in OUTPUT_CONTRACT.md",
+  "type": "object",
+  "required": [
+    "document_metadata",
+    "section_1_header",
+    "section_2_question_presented",
+    "section_3_brief_answer",
+    "section_4_applicable_regulations",
+    "section_5_regulatory_analysis",
+    "section_6_assumptions_limitations",
+    "section_7_references_citations",
+    "section_8_disclaimer"
+  ],
+  "properties": {
+    "document_metadata": {
+      "type": "object",
+      "description": "Document identification and tracking metadata",
+      "required": [
+        "document_id",
+        "generated_timestamp",
+        "system_version",
+        "query_reference"
+      ],
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "description": "Unique document identifier in format RCM-YYYY-NNN-XXXXX",
+          "pattern": "^RCM-\\d{4}-\\d{3,}-[A-Z0-9]{5,}$"
+        },
+        "generated_timestamp": {
+          "type": "string",
+          "description": "Document generation timestamp in ISO 8601 format",
+          "format": "date-time"
+        },
+        "system_version": {
+          "type": "string",
+          "description": "EnviroEcon Compliance Copilot version identifier",
+          "pattern": "^v?\\d+\\.\\d+\\.\\d+.*$"
+        },
+        "query_reference": {
+          "type": "string",
+          "description": "Summary or reference number for user query",
+          "minLength": 10,
+          "maxLength": 500
+        }
+      }
+    },
+    "section_1_header": {
+      "type": "object",
+      "description": "Section 1: Header and Metadata",
+      "required": [
+        "title",
+        "prominent_disclaimer",
+        "metadata_complete"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Document title - MUST be exactly 'Regulatory / Environmental Compliance Response Memorandum'",
+          "enum": [
+            "Regulatory / Environmental Compliance Response Memorandum"
+          ]
+        },
+        "prominent_disclaimer": {
+          "type": "string",
+          "description": "Prominent legal disclaimer at document start",
+          "minLength": 50,
+          "pattern": ".*informational purposes only.*not constitute legal advice.*"
+        },
+        "metadata_complete": {
+          "type": "boolean",
+          "description": "Confirmation that all required metadata elements are present",
+          "const": true
+        }
+      }
+    },
+    "section_2_question_presented": {
+      "type": "object",
+      "description": "Section 2: Question Presented",
+      "required": [
+        "question_text",
+        "jurisdictional_scope",
+        "temporal_scope",
+        "key_assumptions"
+      ],
+      "properties": {
+        "question_text": {
+          "type": "string",
+          "description": "Clear statement of the regulatory question",
+          "minLength": 50,
+          "maxLength": 2000
+        },
+        "jurisdictional_scope": {
+          "type": "object",
+          "description": "Jurisdictional scope identification",
+          "required": [
+            "federal",
+            "state"
+          ],
+          "properties": {
+            "federal": {
+              "type": "boolean",
+              "description": "Whether federal regulations apply"
+            },
+            "state": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "State jurisdiction if applicable, null if not specified"
+            },
+            "local": {
+              "type": "boolean",
+              "description": "Whether local regulations may apply"
+            }
+          }
+        },
+        "temporal_scope": {
+          "type": "string",
+          "description": "Temporal scope (effective dates, deadlines, etc.)",
+          "minLength": 10
+        },
+        "key_assumptions": {
+          "type": "array",
+          "description": "Key factual premises stated as assumptions",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 10
+          }
+        }
+      }
+    },
+    "section_3_brief_answer": {
+      "type": "object",
+      "description": "Section 3: Brief Answer",
+      "required": [
+        "answer_text",
+        "conservative_interpretation_applied",
+        "key_citations",
+        "professional_review_recommended",
+        "limitations_disclosed"
+      ],
+      "properties": {
+        "answer_text": {
+          "type": "string",
+          "description": "Direct answer to the question presented",
+          "minLength": 100,
+          "maxLength": 3000
+        },
+        "conservative_interpretation_applied": {
+          "type": "boolean",
+          "description": "Whether conservative interpretation was applied",
+          "const": true
+        },
+        "key_citations": {
+          "type": "array",
+          "description": "Key regulatory citations supporting the answer (minimum 1)",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "citation",
+              "verified"
+            ],
+            "properties": {
+              "citation": {
+                "type": "string",
+                "description": "Complete legal citation",
+                "minLength": 5
+              },
+              "verified": {
+                "type": "boolean",
+                "description": "Whether citation was verified against authoritative source",
+                "const": true
+              },
+              "url": {
+                "type": "string",
+                "description": "Direct URL to authoritative source",
+                "format": "uri"
+              }
+            }
+          }
+        },
+        "professional_review_recommended": {
+          "type": "boolean",
+          "description": "Whether professional review is recommended",
+          "const": true
+        },
+        "limitations_disclosed": {
+          "type": "boolean",
+          "description": "Whether limitations are disclosed in brief answer",
+          "const": true
+        },
+        "language_compliance": {
+          "type": "object",
+          "description": "Language compliance verification",
+          "required": [
+            "no_legal_advice_language",
+            "no_you_must_language",
+            "informational_tone"
+          ],
+          "properties": {
+            "no_legal_advice_language": {
+              "type": "boolean",
+              "description": "Verified no prohibited legal advice language",
+              "const": true
+            },
+            "no_you_must_language": {
+              "type": "boolean",
+              "description": "Verified no 'you must' or 'you should' language",
+              "const": true
+            },
+            "informational_tone": {
+              "type": "boolean",
+              "description": "Verified informational tone maintained",
+              "const": true
+            }
+          }
+        }
+      }
+    },
+    "section_4_applicable_regulations": {
+      "type": "object",
+      "description": "Section 4: Applicable Regulations",
+      "required": [
+        "regulations",
+        "all_citations_verified",
+        "all_urls_provided",
+        "effective_dates_included"
+      ],
+      "properties": {
+        "regulations": {
+          "type": "array",
+          "description": "Complete list of applicable regulations with citations",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "citation",
+              "regulatory_text",
+              "source_url",
+              "verified_date",
+              "effective_date"
+            ],
+            "properties": {
+              "citation": {
+                "type": "string",
+                "description": "Complete legal citation in standard format",
+                "minLength": 5
+              },
+              "regulatory_text": {
+                "type": "string",
+                "description": "Full regulatory text or accurate summary with direct citation",
+                "minLength": 20
+              },
+              "source_url": {
+                "type": "string",
+                "description": "Direct URL to authoritative source document",
+                "format": "uri"
+              },
+              "verified_date": {
+                "type": "string",
+                "description": "Date citation was verified in ISO 8601 format",
+                "format": "date-time"
+              },
+              "effective_date": {
+                "type": "string",
+                "description": "Effective date or version information"
+              },
+              "jurisdiction": {
+                "type": "string",
+                "description": "Jurisdiction (federal, state, local)",
+                "enum": [
+                  "federal",
+                  "state",
+                  "local"
+                ]
+              },
+              "related_citations": {
+                "type": "array",
+                "description": "Cross-references to related regulations",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "all_citations_verified": {
+          "type": "boolean",
+          "description": "Confirmation that all citations verified against authoritative sources",
+          "const": true
+        },
+        "all_urls_provided": {
+          "type": "boolean",
+          "description": "Confirmation that all citations include working URLs",
+          "const": true
+        },
+        "effective_dates_included": {
+          "type": "boolean",
+          "description": "Confirmation that effective dates or version info included",
+          "const": true
+        }
+      }
+    },
+    "section_5_regulatory_analysis": {
+      "type": "object",
+      "description": "Section 5: Regulatory Analysis",
+      "required": [
+        "analysis_elements",
+        "conservative_interpretation_documented",
+        "uncertainties_flagged",
+        "gaps_identified"
+      ],
+      "properties": {
+        "analysis_elements": {
+          "type": "array",
+          "description": "Element-by-element breakdown of regulatory requirements",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "requirement",
+              "citation",
+              "interpretation",
+              "application",
+              "uncertainties"
+            ],
+            "properties": {
+              "requirement": {
+                "type": "string",
+                "description": "Statement of regulatory requirement",
+                "minLength": 20
+              },
+              "citation": {
+                "type": "string",
+                "description": "Specific citation to regulatory text",
+                "minLength": 5
+              },
+              "interpretation": {
+                "type": "object",
+                "description": "Interpretation of requirement",
+                "required": [
+                  "interpretation_text",
+                  "conservative_approach_applied"
+                ],
+                "properties": {
+                  "interpretation_text": {
+                    "type": "string",
+                    "description": "Conservative interpretation of requirement",
+                    "minLength": 20
+                  },
+                  "conservative_approach_applied": {
+                    "type": "boolean",
+                    "description": "Whether conservative approach was applied",
+                    "const": true
+                  },
+                  "alternative_interpretations": {
+                    "type": "array",
+                    "description": "Alternative interpretations if applicable",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "interpretation": {
+                          "type": "string"
+                        },
+                        "reason_not_applied": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "application": {
+                "type": "string",
+                "description": "Application of regulation to stated facts/assumptions",
+                "minLength": 20
+              },
+              "uncertainties": {
+                "type": "array",
+                "description": "Identified uncertainties or gaps",
+                "items": {
+                  "type": "string",
+                  "minLength": 10
+                }
+              }
+            }
+          }
+        },
+        "conservative_interpretation_documented": {
+          "type": "boolean",
+          "description": "Confirmation that conservative interpretations are documented",
+          "const": true
+        },
+        "uncertainties_flagged": {
+          "type": "boolean",
+          "description": "Confirmation that uncertainties are prominently flagged",
+          "const": true
+        },
+        "gaps_identified": {
+          "type": "boolean",
+          "description": "Confirmation that information gaps are identified",
+          "const": true
+        }
+      }
+    },
+    "section_6_assumptions_limitations": {
+      "type": "object",
+      "description": "Section 6: Assumptions and Limitations",
+      "required": [
+        "factual_assumptions",
+        "interpretive_assumptions",
+        "jurisdictional_assumptions",
+        "temporal_assumptions",
+        "limitations",
+        "information_gaps",
+        "not_covered_list",
+        "all_assumptions_categorized",
+        "impact_analysis_included"
+      ],
+      "properties": {
+        "factual_assumptions": {
+          "type": "array",
+          "description": "Factual assumptions made",
+          "items": {
+            "type": "object",
+            "required": [
+              "assumption",
+              "rationale",
+              "impact_if_incorrect"
+            ],
+            "properties": {
+              "assumption": {
+                "type": "string",
+                "description": "Statement of factual assumption",
+                "minLength": 10
+              },
+              "rationale": {
+                "type": "string",
+                "description": "Rationale for assumption",
+                "minLength": 10
+              },
+              "impact_if_incorrect": {
+                "type": "string",
+                "description": "Impact if assumption is incorrect",
+                "minLength": 10
+              }
+            }
+          }
+        },
+        "interpretive_assumptions": {
+          "type": "array",
+          "description": "Interpretive assumptions and choices",
+          "items": {
+            "type": "object",
+            "required": [
+              "issue",
+              "interpretation_chosen",
+              "alternatives_considered"
+            ],
+            "properties": {
+              "issue": {
+                "type": "string",
+                "description": "Interpretive issue",
+                "minLength": 10
+              },
+              "interpretation_chosen": {
+                "type": "string",
+                "description": "Interpretation chosen (conservative)",
+                "minLength": 10
+              },
+              "alternatives_considered": {
+                "type": "array",
+                "description": "Alternative interpretations considered",
+                "items": {
+                  "type": "string",
+                  "minLength": 10
+                }
+              }
+            }
+          }
+        },
+        "jurisdictional_assumptions": {
+          "type": "array",
+          "description": "Jurisdictional assumptions",
+          "items": {
+            "type": "object",
+            "required": [
+              "assumption",
+              "impact"
+            ],
+            "properties": {
+              "assumption": {
+                "type": "string",
+                "description": "Jurisdictional assumption",
+                "minLength": 10
+              },
+              "impact": {
+                "type": "string",
+                "description": "Impact on analysis",
+                "minLength": 10
+              }
+            }
+          }
+        },
+        "temporal_assumptions": {
+          "type": "array",
+          "description": "Temporal assumptions (effective dates, currency)",
+          "items": {
+            "type": "object",
+            "required": [
+              "assumption",
+              "limitation"
+            ],
+            "properties": {
+              "assumption": {
+                "type": "string",
+                "description": "Temporal assumption",
+                "minLength": 10
+              },
+              "limitation": {
+                "type": "string",
+                "description": "Associated limitation",
+                "minLength": 10
+              }
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Analytical limitations",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "description": "Specific limitation of analysis",
+            "minLength": 10
+          }
+        },
+        "information_gaps": {
+          "type": "array",
+          "description": "Identified information gaps requiring additional research",
+          "items": {
+            "type": "string",
+            "description": "Specific information gap",
+            "minLength": 10
+          }
+        },
+        "not_covered_list": {
+          "type": "array",
+          "description": "Explicit list of what is NOT covered by analysis",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "description": "Topic or requirement NOT covered",
+            "minLength": 10
+          }
+        },
+        "all_assumptions_categorized": {
+          "type": "boolean",
+          "description": "Confirmation that all assumptions are properly categorized",
+          "const": true
+        },
+        "impact_analysis_included": {
+          "type": "boolean",
+          "description": "Confirmation that impact of incorrect assumptions is analyzed",
+          "const": true
+        }
+      }
+    },
+    "section_7_references_citations": {
+      "type": "object",
+      "description": "Section 7: References and Citations",
+      "required": [
+        "federal_regulations",
+        "verification_summary",
+        "all_urls_verified",
+        "all_dates_included"
+      ],
+      "properties": {
+        "federal_regulations": {
+          "type": "array",
+          "description": "Federal regulations cited",
+          "items": {
+            "type": "object",
+            "required": [
+              "citation",
+              "url",
+              "verified_date"
+            ],
+            "properties": {
+              "citation": {
+                "type": "string",
+                "description": "Complete citation",
+                "minLength": 5
+              },
+              "url": {
+                "type": "string",
+                "description": "Direct URL to source",
+                "format": "uri"
+              },
+              "verified_date": {
+                "type": "string",
+                "description": "Verification date in ISO 8601",
+                "format": "date-time"
+              },
+              "effective_date": {
+                "type": "string",
+                "description": "Effective date information"
+              }
+            }
+          }
+        },
+        "state_regulations": {
+          "type": "array",
+          "description": "State regulations cited",
+          "items": {
+            "type": "object",
+            "required": [
+              "citation",
+              "url",
+              "verified_date"
+            ],
+            "properties": {
+              "citation": {
+                "type": "string",
+                "minLength": 5
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "verified_date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "guidance_documents": {
+          "type": "array",
+          "description": "Guidance documents cited",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "source",
+              "url",
+              "accessed_date"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 5
+              },
+              "source": {
+                "type": "string",
+                "description": "Issuing agency/organization"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "accessed_date": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "publication_date": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "verification_summary": {
+          "type": "object",
+          "description": "Citation verification summary",
+          "required": [
+            "total_citations",
+            "verified_successfully",
+            "broken_links",
+            "unverifiable"
+          ],
+          "properties": {
+            "total_citations": {
+              "type": "integer",
+              "description": "Total number of citations",
+              "minimum": 1
+            },
+            "verified_successfully": {
+              "type": "integer",
+              "description": "Number successfully verified",
+              "minimum": 1
+            },
+            "broken_links": {
+              "type": "integer",
+              "description": "Number of broken links (MUST be 0)",
+              "const": 0
+            },
+            "unverifiable": {
+              "type": "integer",
+              "description": "Number of unverifiable citations (MUST be 0)",
+              "const": 0
+            },
+            "verification_date_range": {
+              "type": "string",
+              "description": "Date range of verification activities"
+            }
+          }
+        },
+        "all_urls_verified": {
+          "type": "boolean",
+          "description": "Confirmation that all URLs are verified and accessible",
+          "const": true
+        },
+        "all_dates_included": {
+          "type": "boolean",
+          "description": "Confirmation that all verification dates included",
+          "const": true
+        }
+      }
+    },
+    "section_8_disclaimer": {
+      "type": "object",
+      "description": "Section 8: Disclaimer and Professional Review Recommendation",
+      "required": [
+        "not_legal_advice_statement",
+        "no_attorney_client_statement",
+        "no_warranties_statement",
+        "professional_review_required",
+        "professional_specialties_identified",
+        "currency_advisory",
+        "completeness_limitation",
+        "facility_specific_limitation",
+        "user_responsibilities_listed",
+        "liability_limitation"
+      ],
+      "properties": {
+        "not_legal_advice_statement": {
+          "type": "string",
+          "description": "Explicit NOT LEGAL ADVICE statement",
+          "minLength": 50,
+          "pattern": ".*NOT LEGAL ADVICE.*informational.*educational.*"
+        },
+        "no_attorney_client_statement": {
+          "type": "string",
+          "description": "No attorney-client relationship statement",
+          "minLength": 20,
+          "pattern": ".*not create.*attorney-client.*"
+        },
+        "no_warranties_statement": {
+          "type": "string",
+          "description": "No warranties disclaimer",
+          "minLength": 20,
+          "pattern": ".*no warrant.*as is.*"
+        },
+        "professional_review_required": {
+          "type": "object",
+          "description": "Professional review requirement",
+          "required": [
+            "statement",
+            "specialties_required"
+          ],
+          "properties": {
+            "statement": {
+              "type": "string",
+              "description": "Statement that professional review is MANDATORY",
+              "minLength": 50,
+              "pattern": ".*[Pp]rofessional [Rr]eview.*[Mm]andatory|[Rr]equired.*"
+            },
+            "specialties_required": {
+              "type": "array",
+              "description": "List of professional specialties required for review",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 10
+              }
+            }
+          }
+        },
+        "professional_specialties_identified": {
+          "type": "boolean",
+          "description": "Confirmation that required professional specialties are identified",
+          "const": true
+        },
+        "currency_advisory": {
+          "type": "string",
+          "description": "Advisory about regulatory currency and changes",
+          "minLength": 20
+        },
+        "completeness_limitation": {
+          "type": "string",
+          "description": "Statement of completeness limitations",
+          "minLength": 20
+        },
+        "facility_specific_limitation": {
+          "type": "string",
+          "description": "Statement about facility-specific factors limitation",
+          "minLength": 20
+        },
+        "user_responsibilities_listed": {
+          "type": "array",
+          "description": "List of user responsibilities",
+          "minItems": 3,
+          "items": {
+            "type": "string",
+            "minLength": 10
+          }
+        },
+        "liability_limitation": {
+          "type": "string",
+          "description": "Liability limitation statement",
+          "minLength": 50,
+          "pattern": ".*disclaim.*liability.*"
+        },
+        "system_limitations_disclosed": {
+          "type": "string",
+          "description": "Disclosure of AI-assisted system limitations",
+          "minLength": 20
+        }
+      }
+    },
+    "quality_assurance": {
+      "type": "object",
+      "description": "Quality assurance verification (meta-data for validation)",
+      "required": [
+        "all_sections_present",
+        "all_citations_verified",
+        "all_assumptions_documented",
+        "conservative_interpretation_applied",
+        "language_compliance_verified",
+        "disclaimer_compliance_verified",
+        "limitations_disclosed"
+      ],
+      "properties": {
+        "all_sections_present": {
+          "type": "boolean",
+          "description": "All 8 sections present in correct order",
+          "const": true
+        },
+        "all_citations_verified": {
+          "type": "boolean",
+          "description": "Every citation verified against authoritative sources",
+          "const": true
+        },
+        "all_assumptions_documented": {
+          "type": "boolean",
+          "description": "All assumptions explicitly stated and categorized",
+          "const": true
+        },
+        "conservative_interpretation_applied": {
+          "type": "boolean",
+          "description": "Conservative interpretation applied throughout",
+          "const": true
+        },
+        "language_compliance_verified": {
+          "type": "boolean",
+          "description": "No legal advice language present",
+          "const": true
+        },
+        "disclaimer_compliance_verified": {
+          "type": "boolean",
+          "description": "All required disclaimers present",
+          "const": true
+        },
+        "limitations_disclosed": {
+          "type": "boolean",
+          "description": "All limitations clearly disclosed",
+          "const": true
+        }
+      }
+    }
+  }
+}

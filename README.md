@@ -63,6 +63,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for information on contributing to this p
 
 ## Documentation
 
+### System Contracts (Mandatory Specifications)
+- **[Output Contract](docs/OUTPUT_CONTRACT.md)**: NON-NEGOTIABLE 8-section compliance memorandum structure
+- **[Input Contract](docs/INPUT_CONTRACT.md)**: NON-NEGOTIABLE 5-step user input wizard specification
+
 ### System Design
 - **[Architecture Overview](docs/ARCHITECTURE.md)**: System design, components, and data flow
 - **[Guardrails](docs/GUARDRAILS.md)**: Defensive design principles and safeguards
