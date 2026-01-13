@@ -63,9 +63,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for information on contributing to this p
 
 ## Documentation
 
+### System Design
 - **[Architecture Overview](docs/ARCHITECTURE.md)**: System design, components, and data flow
 - **[Guardrails](docs/GUARDRAILS.md)**: Defensive design principles and safeguards
 - **[Citation Standards](docs/CITATION_STANDARDS.md)**: Requirements for regulatory citations
+
+### Project Information
+- **[Roadmap](docs/ROADMAP.md)**: Development phases and timeline
+- **[Developer Guide](docs/DEVELOPER_GUIDE.md)**: Quick reference for contributors
+- **[Security Policy](SECURITY.md)**: Vulnerability reporting and security practices
+
+### Contributing
+- **[Contributing Guidelines](CONTRIBUTING.md)**: How to contribute effectively
+- **[Code of Conduct](CODE_OF_CONDUCT.md)**: Community standards
+- **[Disclaimer](DISCLAIMER.md)**: Important legal limitations and disclaimers
 
 ## License
 
